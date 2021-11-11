@@ -21,7 +21,7 @@ async function run() {
     await client.connect();
     const productsCollection = client.db('skyCloud').collection('products');
     const ordersCollection = client.db('skyCloud').collection('orders');
-    const usersCollection = client.db('skyCloud').collection('orders');
+    const usersCollection = client.db('skyCloud').collection('users');
 
     // Find Single Product
     app.get('/products/:id', async (req, res) => {
@@ -42,6 +42,38 @@ async function run() {
     app.post('/addOrder', async (req, res) => {
       const newOrder = req.body;
       const result = await ordersCollection.insertOne(newOrder);
+      res.json(result);
+    });
+
+    //Add Email Registered user
+    app.post('/users', async (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const result = await usersCollection.insertOne(user);
+      console.log(result);
+      res.json(result);
+    });
+
+    //Add Google sing in user
+    app.put('/users', async (req, res) => {
+      const user = req.body;
+      const filter = { email: user.email };
+      const options = { upsert: true };
+      const updateDoc = { $set: user };
+      const result = await usersCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      res.json(result);
+    });
+
+    app.put('/users/admin', async (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const filter = { email: user.email };
+      const updateDoc = { $set: { role: 'admin' } };
+      const result = await usersCollection.updateOne(filter, updateDoc);
       res.json(result);
     });
   } finally {
