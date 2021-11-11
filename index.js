@@ -23,10 +23,25 @@ async function run() {
     const ordersCollection = client.db('skyCloud').collection('orders');
     const usersCollection = client.db('skyCloud').collection('orders');
 
-    //Find All Services
+    // Find Single Product
+    app.get('/products/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await productsCollection.findOne(query);
+      res.json(result);
+    });
+
+    //Find All Products
     app.get('/products', async (req, res) => {
       const cursor = productsCollection.find({});
       const result = await cursor.toArray();
+      res.json(result);
+    });
+
+    // Add An Order
+    app.post('/addOrder', async (req, res) => {
+      const newOrder = req.body;
+      const result = await ordersCollection.insertOne(newOrder);
       res.json(result);
     });
   } finally {
