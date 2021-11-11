@@ -67,13 +67,73 @@ async function run() {
       );
       res.json(result);
     });
-
+    //Make Admin by email
     app.put('/users/admin', async (req, res) => {
       const user = req.body;
       console.log(user);
       const filter = { email: user.email };
       const updateDoc = { $set: { role: 'admin' } };
       const result = await usersCollection.updateOne(filter, updateDoc);
+      res.json(result);
+    });
+
+    //Find My Orders by email
+    app.post('/myOrders/:email', async (req, res) => {
+      const email = req.params.email;
+
+      const cursor = ordersCollection.find({});
+      const result = await cursor.toArray();
+      const myOrders = result.filter((booking) => booking.email === email);
+      res.json(myOrders);
+    });
+
+    //Find all orders
+    app.get('/allOrders', async (req, res) => {
+      const cursor = ordersCollection.find({});
+      const result = await cursor.toArray();
+      res.json(result);
+    });
+
+    //Check admin or not by email
+    app.get('/users/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      let isAdmin = false;
+      if (user?.role === 'admin') {
+        isAdmin = true;
+      }
+      res.json({ admin: isAdmin });
+    });
+
+    //Update pending status
+    app.put('/upadateOrders/:id', async (req, res) => {
+      const id = req.params.id;
+      const updatedStatus = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          status: updatedStatus.status,
+        },
+      };
+      const result = await ordersCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      console.log(
+        `${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`
+      );
+      res.json(result);
+    });
+
+    //Delete My Booking
+    app.delete('/deleteMyOrder/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await ordersCollection.deleteOne(query);
+      console.log(result);
       res.json(result);
     });
   } finally {
