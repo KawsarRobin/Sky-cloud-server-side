@@ -77,9 +77,7 @@ async function run() {
     //Add Email Registered user
     app.post('/users', async (req, res) => {
       const user = req.body;
-      console.log(user);
       const result = await usersCollection.insertOne(user);
-      console.log(result);
       res.json(result);
     });
 
@@ -99,7 +97,7 @@ async function run() {
     //Make Admin by email
     app.put('/users/admin', async (req, res) => {
       const user = req.body;
-      console.log(user);
+
       const filter = { email: user.email };
       const updateDoc = { $set: { role: 'admin' } };
       const result = await usersCollection.updateOne(filter, updateDoc);
@@ -144,9 +142,6 @@ async function run() {
         updateDoc,
         options
       );
-      console.log(
-        `${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`
-      );
       res.json(result);
     });
 
@@ -155,14 +150,12 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await ordersCollection.deleteOne(query);
-      console.log(result);
       res.json(result);
     });
 
     //Delete A product
     app.delete('/deleteProduct/:id', async (req, res) => {
       const id = req.params.id;
-      console.log(id);
       const query = { _id: ObjectId(id) };
       const result = await productsCollection.deleteOne(query);
       res.json(result);
