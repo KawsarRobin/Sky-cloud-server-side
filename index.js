@@ -22,6 +22,7 @@ async function run() {
     const productsCollection = client.db('skyCloud').collection('products');
     const ordersCollection = client.db('skyCloud').collection('orders');
     const usersCollection = client.db('skyCloud').collection('users');
+    const reviewsCollection = client.db('skyCloud').collection('reviews');
 
     // Find Single Product
     app.get('/products/:id', async (req, res) => {
@@ -35,6 +36,34 @@ async function run() {
     app.get('/products', async (req, res) => {
       const cursor = productsCollection.find({});
       const result = await cursor.toArray();
+      res.json(result);
+    });
+
+    //Find all orders
+    app.get('/allOrders', async (req, res) => {
+      const cursor = ordersCollection.find({});
+      const result = await cursor.toArray();
+      res.json(result);
+    });
+
+    //Find all reviews
+    app.get('/reviews', async (req, res) => {
+      const cursor = reviewsCollection.find({});
+      const result = await cursor.toArray();
+      res.json(result);
+    });
+
+    //ADD  A new product
+    app.post('/addProduct', async (req, res) => {
+      const newProduct = req.body;
+      const result = await productsCollection.insertOne(newProduct);
+      res.json(result);
+    });
+
+    //ADD  A Review
+    app.post('/addReview', async (req, res) => {
+      const newReview = req.body;
+      const result = await reviewsCollection.insertOne(newReview);
       res.json(result);
     });
 
@@ -87,13 +116,6 @@ async function run() {
       res.json(myOrders);
     });
 
-    //Find all orders
-    app.get('/allOrders', async (req, res) => {
-      const cursor = ordersCollection.find({});
-      const result = await cursor.toArray();
-      res.json(result);
-    });
-
     //Check admin or not by email
     app.get('/users/:email', async (req, res) => {
       const email = req.params.email;
@@ -128,12 +150,21 @@ async function run() {
       res.json(result);
     });
 
-    //Delete My Booking
+    //Delete An Order
     app.delete('/deleteMyOrder/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await ordersCollection.deleteOne(query);
       console.log(result);
+      res.json(result);
+    });
+
+    //Delete A product
+    app.delete('/deleteProduct/:id', async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const query = { _id: ObjectId(id) };
+      const result = await productsCollection.deleteOne(query);
       res.json(result);
     });
   } finally {
