@@ -46,6 +46,16 @@ async function run() {
       res.json(result);
     });
 
+    //Find My Orders by email
+    app.post('/myOrders/:email', async (req, res) => {
+      const email = req.params.email;
+
+      const cursor = ordersCollection.find({});
+      const result = await cursor.toArray();
+      const myOrders = result.filter((booking) => booking.email === email);
+      res.json(myOrders);
+    });
+
     //Find all reviews
     app.get('/reviews', async (req, res) => {
       const cursor = reviewsCollection.find({});
@@ -94,6 +104,7 @@ async function run() {
       );
       res.json(result);
     });
+
     //Make Admin by email
     app.put('/users/admin', async (req, res) => {
       const user = req.body;
@@ -102,16 +113,6 @@ async function run() {
       const updateDoc = { $set: { role: 'admin' } };
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.json(result);
-    });
-
-    //Find My Orders by email
-    app.post('/myOrders/:email', async (req, res) => {
-      const email = req.params.email;
-
-      const cursor = ordersCollection.find({});
-      const result = await cursor.toArray();
-      const myOrders = result.filter((booking) => booking.email === email);
-      res.json(myOrders);
     });
 
     //Check admin or not by email
